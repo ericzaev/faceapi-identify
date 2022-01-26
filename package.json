@@ -1,0 +1,18 @@
+{
+  "name": "faceapi-identify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^3.13.0",
+    "@vladmandic/face-api": "^1.6.4",
+    "canvas": "^2.9.0",
+    "express": "^4.17.2",
+    "express-fileupload": "^1.2.1"
+  }
+}
