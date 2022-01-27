@@ -17,5 +17,4 @@ npm-debug.log
 .bashrc
 .DS_Store
 __MACOSX
-models
 node_modules

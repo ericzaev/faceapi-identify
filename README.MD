@@ -1,5 +1,13 @@
 `docker run -d -p 3000:3000 --env ACCESS_TOKEN=123456789 --name=faceapi-identify --restart=always eskater/faceapi-identify:latest`
 
+### used models
+
+```
+faceapi.nets.ssdMobilenetv1.loadFromDisk('./models/ssd_mobilenetv1');
+faceapi.nets.faceLandmark68Net.loadFromDisk('./models/face_landmark_68');
+faceapi.nets.faceRecognitionNet.loadFromDisk('./models/face_recognition');
+```
+
 ### envs
 
 1. ACCESS_TOKEN=null
@@ -10,7 +18,7 @@
 
 ### nginx
 ```
-location /broadcast/ {
+location /faceapi/ {
   proxy_pass http://faceapi-identify:3000/;
 
   proxy_http_version 1.1;
@@ -24,7 +32,7 @@ location /broadcast/ {
 
 ### docker-compose
 ```
-broadcast:
+faceapi:
     image: eskater/faceapi-identify:latest
     container_name: app_faceapi-identify
     environment:

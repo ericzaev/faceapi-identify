@@ -17,21 +17,37 @@ const fileUpload = require('express-fileupload');
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(fileUpload({createParentPath: true}));
+app.use(fileUpload());
+
+function toMultipleFiles(files) {
+    if (files && typeof files['data'] !== 'undefined') {
+        return [files];
+    }
+
+    return files;
+}
 
 app.post('/identify', async(request, response) => {
     const token = process.env.ACCESS_TOKEN;
 
     if (!token || token !== request.query['access_token']) {
-        response.status(403);
+        response.status(403).end();
+
+        return;
+    }
+
+    if (!request.files) {
+        response.status(422).end();
+
+        return;
     }
 
     const result = [];
-    const images = request.files.images;
+    const images = toMultipleFiles(request.files['images']);
     const descriptors = request.body.descriptors;
 
     for (const index in images) {
-        const image = images[index].data;
+        const image = images[index]['data'];
         const descriptor = descriptors ? descriptors[index] : request.body.descriptor;
 
         result[index] = false;
@@ -40,7 +56,7 @@ app.post('/identify', async(request, response) => {
             try {
                 const data = await faceapi.detectSingleFace(await canvas.loadImage(image)).withFaceLandmarks().withFaceDescriptor();
                 const matcher = new faceapi.FaceMatcher(data);
-                const matching = matcher.findBestMatch(descriptor);
+                const matching = matcher.findBestMatch(typeof descriptor === 'string' ? JSON.parse(descriptor) : descriptor);
 
                 result[index] = matching.label !== 'unknown';
             } catch (error) {}
@@ -54,14 +70,22 @@ app.post('/descriptors', async(request, response) => {
     const token = process.env.ACCESS_TOKEN;
 
     if (!token || token !== request.query['access_token']) {
-        response.status(403);
+        response.status(403).end();
+
+        return;
+    }
+
+    if (!request.files) {
+        response.status(422).end();
+
+        return;
     }
 
     const result = [];
-    const images = request.files.images;
+    const images = toMultipleFiles(request.files['images']);
 
     for (const index in images) {
-        const image = images[index].data;
+        const image = images[index]['data'];
 
         result[index] = null;
 
